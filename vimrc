@@ -73,11 +73,22 @@ let g:Powerline_symbols = "fancy"
 " Tab Navigation like Firefox
 nnoremap <C-Left> :bprevious<CR>
 nnoremap <C-Right> :bnext<CR>
-"
-" Copy / Paste
-nmap <C-s> mzggVG"*y`z
-nnoremap zj mz"yyy"yP`z
 
+
+if has("win32")
+  "Windows options here
+  " Copy / Paste
+  nmap <C-s> mzggVG"*y`z
+  nnoremap zj mz"yyy"yP`z
+else
+  if has("unix")
+    "Unix options here
+    let s:uname = system("uname")
+    if s:uname == "Darwin\n"
+      "Mac options here
+    endif
+  endif
+endif
 
 if !exists('g:airline_symbols')
     let g:airline_symbols = {}
@@ -86,7 +97,12 @@ endif
 " Specify a directory for plugins
 " - For Neovim: stdpath('data') . '/plugged'
 " - Avoid using standard Vim directory names like 'plugin'
-call plug#begin('C:\Users\X270\Vim\vimfiles\autoload')
+if has("win32")
+  plug#begin('C:\Users\X270\Vim\vimfiles\autoload')
+endif
+if has("unix")
+  call plug#begin()
+endif
 Plug 'vim-airline/vim-airline-themes'
 Plug 'vim-airline/vim-airline'
 Plug 'kien/ctrlp.vim'
