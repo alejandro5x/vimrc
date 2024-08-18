@@ -98,7 +98,7 @@ endif
 " - For Neovim: stdpath('data') . '/plugged'
 " - Avoid using standard Vim directory names like 'plugin'
 if has("win32")
-  plug#begin('C:\Users\X270\Vim\vimfiles\autoload')
+  call plug#begin('C:\Users\<username>\MY_DATA\vim_plugged')
 endif
 if has("unix")
   call plug#begin()
