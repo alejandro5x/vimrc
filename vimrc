@@ -1,6 +1,11 @@
+" Vim with all enhancements
 source $VIMRUNTIME/vimrc_example.vim
 
-set diffexpr=MyDiff()
+" Use the internal diff if available.
+" Otherwise use the special 'diffexpr' for Windows.
+if &diffopt !~# 'internal'
+  set diffexpr=MyDiff()
+endif
 function MyDiff()
   let opt = '-a --binary '
   if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
@@ -50,16 +55,75 @@ set directory^=$HOME/Temp//
 set undodir^=$HOME/Temp//
 
 " Set Indentation
+set expandtab
+set tabstop=2
 set shiftwidth=2
+set softtabstop=2
 set autoindent
 set smartindent
 
 "Colorscheme
-colorscheme desertink
+colorscheme desert
 
 " turn relative line numbers on
 set relativenumber
 set nu rnu
+
+
+" Specify a directory for plugins
+" - For Neovim: stdpath('data') . '/plugged'
+" - Avoid using standard Vim directory names like 'plugin'
+if has("win32")
+  " Define paths
+  let s:autoload_dir = expand('~\\vimfiles\\autoload')
+  let s:plugged_dir = expand('~\\vimfiles\\plugged')
+  let s:plug_vim = s:autoload_dir . '\\plug.vim'
+
+  " Create autoload and plugged dirs if they don't exist
+  if !isdirectory(s:autoload_dir)
+    call mkdir(s:autoload_dir, "p")
+  endif
+  if !isdirectory(s:plugged_dir)
+    call mkdir(s:plugged_dir, "p")
+  endif
+
+  " Download vim-plug if it's not installed
+  if !filereadable(s:plug_vim)
+    silent execute '!powershell -Command "Invoke-WebRequest https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim -OutFile ' . s:plug_vim . '"'
+  endif
+
+  call plug#begin('~\vimfiles\plugged')
+endif
+if has("unix")
+  let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+  if empty(glob(data_dir . '/autoload/plug.vim'))
+    silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+  endif
+  call plug#begin()
+endif
+Plug 'vim-airline/vim-airline-themes'
+Plug 'vim-airline/vim-airline'
+Plug 'kien/ctrlp.vim'
+" Initialize plugin system
+call plug#end()
+
+if has("gui_running")
+"  nnoremap <F12> :silent! :so ./vim/xx.l<CR>
+"  nnoremap <C-Up> :silent! :so ./vim/xx.l<CR>
+"  nnoremap <C-Down> :silent! :so Vim/yy.l<CR>
+  nnoremap <C-Up> :silent! let &guifont = substitute(
+   \ &guifont,
+   \ ':h\zs\d\+',
+   \ '\=eval(submatch(0)+1)',
+   \ 'g')<CR><CR>
+  nnoremap <C-Down> :silent! let &guifont = substitute(
+   \ &guifont,
+   \ ':h\zs\d\+',
+   \ '\=eval(submatch(0)-1)',
+   \ 'g')<CR><CR>
+endif
+
 
 " Airline config
 set encoding=utf-8
@@ -91,41 +155,5 @@ else
 endif
 
 if !exists('g:airline_symbols')
-    let g:airline_symbols = {}
-endif
-
-" Specify a directory for plugins
-" - For Neovim: stdpath('data') . '/plugged'
-" - Avoid using standard Vim directory names like 'plugin'
-if has("win32")
-  call plug#begin('C:\Users\<username>\MY_DATA\vim_plugged')
-endif
-if has("unix")
-  let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
-  if empty(glob(data_dir . '/autoload/plug.vim'))
-    silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
-  endif
-  call plug#begin()
-endif
-Plug 'vim-airline/vim-airline-themes'
-Plug 'vim-airline/vim-airline'
-Plug 'kien/ctrlp.vim'
-" Initialize plugin system
-call plug#end()
-
-if has("gui_running")
-"  nnoremap <F12> :silent! :so ./vim/xx.l<CR>
-"  nnoremap <C-Up> :silent! :so ./vim/xx.l<CR>
-"  nnoremap <C-Down> :silent! :so Vim/yy.l<CR>
-  nnoremap <C-Up> :silent! let &guifont = substitute(
-   \ &guifont,
-   \ ':h\zs\d\+',
-   \ '\=eval(submatch(0)+1)',
-   \ 'g')<CR><CR>
-  nnoremap <C-Down> :silent! let &guifont = substitute(
-   \ &guifont,
-   \ ':h\zs\d\+',
-   \ '\=eval(submatch(0)-1)',
-   \ 'g')<CR><CR>
+  let g:airline_symbols = {}
 endif
